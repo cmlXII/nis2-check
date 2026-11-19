@@ -1,0 +1,9 @@
+- id: mfa
+  theme: Contrôle d'accès
+  question: "L'authentification multifacteur (MFA) est-elle activée sur les accès distants et l'administration ?"
+  poids: 3
+
+- id: sauvegardes
+  theme: Continuité d'activité
+  question: "Avez-vous des sauvegardes isolées et testées régulièrement ?"
+  poids: 3

@@ -1,0 +1,59 @@
+- id: gouvernance
+  theme: Gouvernance
+  question: "La direction a-t-elle validé une politique de sécurité et en suit-elle l'application ?"
+  poids: 3
+
+- id: inventaire
+  theme: Gouvernance
+  question: "Disposez-vous d'un inventaire à jour de vos serveurs, postes, applications et services en ligne ?"
+  poids: 3
+
+- id: risques
+  theme: Gouvernance
+  question: "Une analyse des risques cyber a-t-elle été réalisée au cours des 12 derniers mois ?"
+  poids: 3
+
+- id: mfa
+  theme: Contrôle d'accès
+  question: "L'authentification multifacteur est-elle activée sur les accès distants et les comptes d'administration ?"
+  poids: 3
+
+- id: privileges
+  theme: Contrôle d'accès
+  question: "Les droits sont-ils limités au strict nécessaire, avec des comptes administrateur distincts des comptes courants ?"
+  poids: 2
+
+- id: correctifs
+  theme: Vulnérabilités
+  question: "Les mises à jour de sécurité sont-elles appliquées rapidement, et les systèmes obsolètes retirés ?"
+  poids: 3
+
+- id: sauvegardes
+  theme: Continuité d'activité
+  question: "Vos sauvegardes sont-elles isolées du réseau principal et leur restauration est-elle testée régulièrement ?"
+  poids: 3
+
+- id: pca
+  theme: Continuité d'activité
+  question: "Existe-t-il un plan de continuité et de reprise d'activité, testé au moins une fois par an ?"
+  poids: 2
+
+- id: incidents
+  theme: Gestion des incidents
+  question: "Une procédure de gestion d'incident existe-t-elle, avec la capacité d'alerter les autorités sous 24 heures ?"
+  poids: 3
+
+- id: journaux
+  theme: Détection
+  question: "Les journaux des systèmes sont-ils centralisés, conservés et surveillés pour détecter les activités suspectes ?"
+  poids: 2
+
+- id: fournisseurs
+  theme: Chaîne d'approvisionnement
+  question: "Les exigences de sécurité sont-elles inscrites dans les contrats avec vos prestataires et fournisseurs critiques ?"
+  poids: 2
+
+- id: formation
+  theme: Sensibilisation
+  question: "Les employés et les dirigeants suivent-ils une formation de sensibilisation à la cybersécurité ?"
+  poids: 2
