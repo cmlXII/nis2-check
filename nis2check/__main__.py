@@ -1,12 +1,12 @@
 from nis2check.moteur import charger_questions, poser_questions, calculer_score, actions_prioritaires
-from nis2check.controles import controle_ssh, controle_ports
+from nis2check.controles import controle_ssh, controle_ports, controle_pare_feu, controle_mises_a_jour
 from nis2check.rapport import generer_rapport
 
 questions = charger_questions("data/questions.yaml")
 reponses = poser_questions(questions)
 score = calculer_score(questions, reponses)
 actions = actions_prioritaires(questions, reponses)
-controles = [controle_ssh(), controle_ports()]
+controles = [controle_ssh(), controle_ports(), controle_pare_feu(), controle_mises_a_jour()]
 
 print(f"\nScore de maturité NIS 2 : {score} / 100")
 

@@ -1,3 +1,5 @@
+import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -37,3 +39,34 @@ def controle_ports():
     if ports:
         return ("ports", "attention", "Ports en écoute : " + ", ".join(sorted(set(ports))))
     return ("ports", "ok", "Aucun port exposé sur le réseau")
+
+
+def _lancer(commande):
+    env = {**os.environ, "LC_ALL": "C"}
+    return subprocess.run(commande, capture_output=True, text=True, env=env).stdout
+
+
+def controle_pare_feu():
+    if os.geteuid() != 0:
+        return ("pare-feu", "ignoré", "Droits root requis pour lire les règles")
+    if shutil.which("ufw"):
+        if "status: active" in _lancer(["ufw", "status"]).lower():
+            return ("pare-feu", "ok", "ufw est actif")
+        return ("pare-feu", "échec", "ufw est installé mais inactif")
+    if shutil.which("nft"):
+        if "hook input" in _lancer(["nft", "list", "ruleset"]):
+            return ("pare-feu", "ok", "Des règles nftables filtrent le trafic entrant")
+        return ("pare-feu", "échec", "Aucune règle nftables sur le trafic entrant")
+    return ("pare-feu", "échec", "Aucun pare-feu détecté")
+
+
+def controle_mises_a_jour():
+    sortie = _lancer(["apt", "list", "--upgradable"])
+    lignes = [l for l in sortie.splitlines() if "upgradable" in l]
+    if not lignes:
+        return ("mises à jour", "ok", "Aucune mise à jour en attente")
+    securite = [l for l in lignes if "security" in l]
+    message = f"{len(lignes)} paquets à mettre à jour"
+    if securite:
+        return ("mises à jour", "échec", f"{message}, dont {len(securite)} de sécurité")
+    return ("mises à jour", "attention", message)

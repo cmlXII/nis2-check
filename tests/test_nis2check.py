@@ -49,3 +49,29 @@ def test_ssh_ligne_commentee_utilise_la_valeur_par_defaut(tmp_path):
     config = tmp_path / "sshd_config"
     config.write_text("#PasswordAuthentication no\n")
     assert controle_ssh(str(config))[1] == "échec"
+
+
+import subprocess
+from nis2check import controles
+
+
+class Faux:
+    def __init__(self, stdout):
+        self.stdout = stdout
+
+
+def test_mises_a_jour_aucune(monkeypatch):
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: Faux("Listing...\n"))
+    assert controles.controle_mises_a_jour()[1] == "ok"
+
+
+def test_mises_a_jour_securite(monkeypatch):
+    sortie = "Listing...\nopenssl/stable-security 3.0 amd64 [upgradable from: 2.9]\n"
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: Faux(sortie))
+    assert controles.controle_mises_a_jour()[1] == "échec"
+
+
+def test_mises_a_jour_normales(monkeypatch):
+    sortie = "Listing...\nvim/stable 9.1 amd64 [upgradable from: 9.0]\n"
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: Faux(sortie))
+    assert controles.controle_mises_a_jour()[1] == "attention"
