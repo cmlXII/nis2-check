@@ -16,7 +16,7 @@ git clone git@github.com:cmlXII/nis2-check.git
 cd nis2-check
 python3 -m venv .venv
 source .venv/bin/activate
-pip install pyyaml
+pip install -r requirements.txt
 ```
 
 ## Utilisation
