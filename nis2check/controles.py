@@ -6,16 +6,25 @@ def controle_ssh(chemin="/etc/ssh/sshd_config"):
     fichier = Path(chemin)
     if not fichier.exists():
         return ("ssh", "ignoré", "Aucun serveur SSH installé")
-    problemes = []
+    reglages = {"permitrootlogin": "prohibit-password", "passwordauthentication": "yes"}
+    vus = set()
     for ligne in fichier.read_text().splitlines():
-        ligne = ligne.strip().lower()
-        if ligne == "permitrootlogin yes":
-            problemes.append("connexion root autorisée")
-        if ligne == "passwordauthentication yes":
-            problemes.append("connexion par mot de passe autorisée")
+        ligne = ligne.strip()
+        if not ligne or ligne.startswith("#"):
+            continue
+        mots = ligne.split()
+        cle = mots[0].lower()
+        if len(mots) >= 2 and cle in reglages and cle not in vus:
+            reglages[cle] = mots[1].lower()
+            vus.add(cle)
+    problemes = []
+    if reglages["permitrootlogin"] == "yes":
+        problemes.append("connexion root par mot de passe autorisée")
+    if reglages["passwordauthentication"] == "yes":
+        problemes.append("connexion par mot de passe autorisée")
     if problemes:
         return ("ssh", "échec", ", ".join(problemes))
-    return ("ssh", "ok", "Aucun réglage dangereux trouvé")
+    return ("ssh", "ok", "Connexion par clé uniquement, root bloqué")
 
 
 def controle_ports():
