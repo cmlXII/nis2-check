@@ -1,16 +1,14 @@
 import os
 import shutil
-import subprocess
 from pathlib import Path
 
+from nis2check.execution import lancer
 
-def controle_ssh(chemin="/etc/ssh/sshd_config"):
-    fichier = Path(chemin)
-    if not fichier.exists():
-        return ("ssh", "ignoré", "Aucun serveur SSH installé")
+
+def _analyser_ssh(texte):
     reglages = {"permitrootlogin": "prohibit-password", "passwordauthentication": "yes"}
     vus = set()
-    for ligne in fichier.read_text().splitlines():
+    for ligne in texte.splitlines():
         ligne = ligne.strip()
         if not ligne or ligne.startswith("#"):
             continue
@@ -29,8 +27,20 @@ def controle_ssh(chemin="/etc/ssh/sshd_config"):
     return ("ssh", "ok", "Connexion par clé uniquement, root bloqué")
 
 
-def controle_ports():
-    sortie = subprocess.run(["ss", "-tln"], capture_output=True, text=True).stdout
+def controle_ssh(chemin="/etc/ssh/sshd_config", hote=None):
+    if hote:
+        texte = lancer(["cat", chemin], hote)
+        if not texte:
+            return ("ssh", "ignoré", "Configuration SSH illisible sur la machine distante")
+        return _analyser_ssh(texte)
+    fichier = Path(chemin)
+    if not fichier.exists():
+        return ("ssh", "ignoré", "Aucun serveur SSH installé")
+    return _analyser_ssh(fichier.read_text())
+
+
+def controle_ports(hote=None):
+    sortie = lancer(["ss", "-tln"], hote)
     ports = []
     for ligne in sortie.splitlines()[1:]:
         adresse = ligne.split()[3]
@@ -41,27 +51,24 @@ def controle_ports():
     return ("ports", "ok", "Aucun port exposé sur le réseau")
 
 
-def _lancer(commande):
-    env = {**os.environ, "LC_ALL": "C"}
-    return subprocess.run(commande, capture_output=True, text=True, env=env).stdout
-
-
-def controle_pare_feu():
+def controle_pare_feu(hote=None):
+    if hote:
+        return ("pare-feu", "ignoré", "Non vérifié à distance (droits root requis)")
     if os.geteuid() != 0:
         return ("pare-feu", "ignoré", "Droits root requis pour lire les règles")
     if shutil.which("ufw"):
-        if "status: active" in _lancer(["ufw", "status"]).lower():
+        if "status: active" in lancer(["ufw", "status"]).lower():
             return ("pare-feu", "ok", "ufw est actif")
         return ("pare-feu", "échec", "ufw est installé mais inactif")
     if shutil.which("nft"):
-        if "hook input" in _lancer(["nft", "list", "ruleset"]):
+        if "hook input" in lancer(["nft", "list", "ruleset"]):
             return ("pare-feu", "ok", "Des règles nftables filtrent le trafic entrant")
         return ("pare-feu", "échec", "Aucune règle nftables sur le trafic entrant")
     return ("pare-feu", "échec", "Aucun pare-feu détecté")
 
 
-def controle_mises_a_jour():
-    sortie = _lancer(["apt", "list", "--upgradable"])
+def controle_mises_a_jour(hote=None):
+    sortie = lancer(["apt", "list", "--upgradable"], hote)
     lignes = [l for l in sortie.splitlines() if "upgradable" in l]
     if not lignes:
         return ("mises à jour", "ok", "Aucune mise à jour en attente")
