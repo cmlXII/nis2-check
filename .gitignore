@@ -1,3 +1,13 @@
+# Environnement virtuel
 .venv/
+
+# Fichiers Python temporaires
+__pycache__/
+*.py[cod]
+
+# Cache des tests
+.pytest_cache/
+
+# Rapports générés
 rapport.html
 rapport.json
