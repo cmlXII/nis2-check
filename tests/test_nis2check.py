@@ -75,3 +75,17 @@ def test_mises_a_jour_normales(monkeypatch):
     sortie = "Listing...\nvim/stable 9.1 amd64 [upgradable from: 9.0]\n"
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: Faux(sortie))
     assert controles.controle_mises_a_jour()[1] == "attention"
+
+
+import json
+from nis2check.export import exporter_json
+
+
+def test_export_json(tmp_path):
+    chemin = tmp_path / "rapport.json"
+    actions = [{"id": "a", "theme": "T", "question": "Q", "poids": 3}]
+    exporter_json(80, actions, [("ssh", "ok", "bien")], str(chemin))
+    donnees = json.loads(chemin.read_text(encoding="utf-8"))
+    assert donnees["score"] == 80
+    assert donnees["actions_prioritaires"][0]["id"] == "a"
+    assert donnees["controles"][0]["statut"] == "ok"

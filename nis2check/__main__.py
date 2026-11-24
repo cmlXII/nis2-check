@@ -1,3 +1,4 @@
+from nis2check.export import exporter_json
 from nis2check.moteur import charger_questions, poser_questions, calculer_score, actions_prioritaires
 from nis2check.controles import controle_ssh, controle_ports, controle_pare_feu, controle_mises_a_jour
 from nis2check.rapport import generer_rapport
@@ -20,3 +21,6 @@ for nom, statut, message in controles:
 
 chemin = generer_rapport(score, actions, controles)
 print(f"\nRapport généré : {chemin}")
+
+chemin_json = exporter_json(score, actions, controles)
+print(f"Export JSON : {chemin_json}")
