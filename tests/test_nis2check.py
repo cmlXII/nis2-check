@@ -270,7 +270,11 @@ Default: deny (incoming), allow (outgoing), disabled (routed)
 
 def test_pare_feu_sans_droits_root(monkeypatch):
     monkeypatch.setattr(controles.os, "geteuid", lambda: 1000)
-    assert controles.controle_pare_feu()[1] == "ignoré"
+
+    resultat = controles.controle_pare_feu()
+
+    assert resultat[1] == "non vérifié"
+    assert "Droits root requis" in resultat[2]
 
 
 def test_pare_feu_erreur_verification(monkeypatch):
@@ -281,3 +285,4 @@ def test_pare_feu_erreur_verification(monkeypatch):
     }
     simuler_pare_feu(monkeypatch, resultats)
     assert controles.controle_pare_feu()[1] == "non vérifié"
+

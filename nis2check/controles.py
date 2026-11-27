@@ -278,14 +278,14 @@ def controle_pare_feu(hote=None):
     if hote:
         return (
             "pare-feu",
-            "ignoré",
+            "non vérifié",
             "Contrôle distant non pris en charge"
         )
 
     if os.geteuid() != 0:
         return (
             "pare-feu",
-            "ignoré",
+            "non vérifié",
             "Droits root requis pour lire les règles"
         )
 
